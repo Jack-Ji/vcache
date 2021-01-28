@@ -13,7 +13,7 @@ type Foo struct {
 }
 
 func TestCache(t *testing.T) {
-	cache, err := NewCache("127.0.0.1:6379", "")
+	cache, err := NewCache("127.0.0.1:6379", "", "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -86,7 +86,7 @@ func TestCache(t *testing.T) {
 }
 
 func BenchmarkCacheSet(b *testing.B) {
-	cache, err := NewCache("127.0.0.1:6379", "")
+	cache, err := NewCache("127.0.0.1:6379", "", "")
 	if err != nil {
 		panic(err)
 	}
@@ -99,7 +99,7 @@ func BenchmarkCacheSet(b *testing.B) {
 }
 
 func BenchmarkCacheGet(b *testing.B) {
-	cache, err := NewCache("127.0.0.1:6379", "")
+	cache, err := NewCache("127.0.0.1:6379", "", "")
 	if err != nil {
 		panic(err)
 	}

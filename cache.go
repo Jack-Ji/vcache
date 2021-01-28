@@ -14,10 +14,11 @@ type Cache struct {
 }
 
 // Create cache handle
-func NewCache(addr, passwd string) (*Cache, error) {
+func NewCache(addr, user, password string) (*Cache, error) {
 	cli := redis.NewClient(&redis.Options{
 		Addr:     addr,
-		Password: passwd,
+		Username: user,
+		Password: password,
 		DB:       9,
 	})
 
