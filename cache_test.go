@@ -18,7 +18,7 @@ func TestCache(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	_, exists, err := cache.Get(context.Background(), "__not_exists")
+	_, exists, err := cache.Get(context.Background(), "myprefix", "__not_exists")
 	if err != nil {
 		t.Error("read fail:", err)
 	}
@@ -26,11 +26,11 @@ func TestCache(t *testing.T) {
 		t.Error("key `__not_exists` should not exist")
 	}
 
-	err = cache.SetWithLifeTime(context.Background(), "hello", "mydata", time.Second)
+	err = cache.SetWithLifeTime(context.Background(), "myprefix", "hello", "mydata", time.Second)
 	if err != nil {
 		t.Error("write cache failed", err)
 	}
-	val, exists, err := cache.Get(context.Background(), "hello")
+	val, exists, err := cache.Get(context.Background(), "myprefix", "hello")
 	if err != nil {
 		t.Error("read cache failed", err)
 	}
@@ -42,7 +42,7 @@ func TestCache(t *testing.T) {
 	}
 
 	time.Sleep(time.Second * 2)
-	_, exists, err = cache.Get(context.Background(), "hello")
+	_, exists, err = cache.Get(context.Background(), "myprefix", "hello")
 	if err != nil {
 		t.Error("read cache failed", err)
 	}
@@ -50,9 +50,9 @@ func TestCache(t *testing.T) {
 		t.Error("cache is not gone")
 	}
 
-	cache.MustSet(&Foo{X: 3, Y: "world"}, "mydata")
+	cache.MustSet("myprefix", &Foo{X: 3, Y: "world"}, "mydata")
 
-	_, exists, err = cache.Get(context.Background(), &Foo{X: 4, Y: "world"})
+	_, exists, err = cache.Get(context.Background(), "myprefix", &Foo{X: 4, Y: "world"})
 	if err != nil {
 		t.Error("read cache failed", err)
 	}
@@ -60,7 +60,7 @@ func TestCache(t *testing.T) {
 		t.Error("cache should not exist")
 	}
 
-	val, exists, err = cache.Get(context.Background(), &Foo{X: 3, Y: "world"})
+	val, exists, err = cache.Get(context.Background(), "myprefix", &Foo{X: 3, Y: "world"})
 	if err != nil {
 		t.Error("read cache failed", err)
 	}
@@ -71,12 +71,12 @@ func TestCache(t *testing.T) {
 		t.Error("cache's content is invalid:", val)
 	}
 
-	err = cache.Del(context.Background(), &Foo{X: 3, Y: "world"})
+	err = cache.Del(context.Background(), "myprefix", &Foo{X: 3, Y: "world"})
 	if err != nil {
 		t.Error("remove cache failed:", err)
 	}
 
-	_, exists, err = cache.Get(context.Background(), &Foo{X: 3, Y: "world"})
+	_, exists, err = cache.Get(context.Background(), "myprefix", &Foo{X: 3, Y: "world"})
 	if err != nil {
 		t.Error("read cache failed", err)
 	}
@@ -94,7 +94,7 @@ func BenchmarkCacheSet(b *testing.B) {
 	key := &Foo{X: 3, Y: "world"}
 	val := strings.Repeat("a", 64*1000)
 	for i := 0; i < b.N; i++ {
-		cache.MustSet(key, val)
+		cache.MustSet("myprefix", key, val)
 	}
 }
 
@@ -106,10 +106,10 @@ func BenchmarkCacheGet(b *testing.B) {
 
 	key := &Foo{X: 3, Y: "world"}
 	val := strings.Repeat("b", 64*1000)
-	cache.MustSet(key, val)
+	cache.MustSet("myprefix", key, val)
 
 	for i := 0; i < b.N; i++ {
-		_, exists, err := cache.Get(context.Background(), key)
+		_, exists, err := cache.Get(context.Background(), "myprefix", key)
 		if err != nil || !exists {
 			panic(err)
 		}
